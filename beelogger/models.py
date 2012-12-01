@@ -24,7 +24,7 @@ class Credit(models.Model):
 class Check(models.Model):
     CHECK_TYPE_CHOICES = (
         ('in', 'Check-in'),
-        ('out', 'Check-out'),
+        ('ou', 'Check-out'),
     )
     user = models.ForeignKey(User)
     datetime = models.DateTimeField(auto_now_add=True)
