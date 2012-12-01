@@ -2,7 +2,8 @@ from django.contrib import admin
 from beelogger.models import Credit, Check
 
 class CreditAdmin(admin.ModelAdmin):
-    list_display = ('user', 'format_unit')
+    list_display = ('user', 'format_unit', 'datetime')
+    list_filter = ['user', 'datetime', 'unit_type']
     readonly_fields = ['datetime']
 
 class CheckAdmin(admin.ModelAdmin):
