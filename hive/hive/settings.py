@@ -1,4 +1,5 @@
 # Django settings for hive project.
+import dj_database_url # import database settings for heroku
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
