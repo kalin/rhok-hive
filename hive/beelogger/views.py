@@ -1,38 +1,24 @@
 from django.views.generic import TemplateView
 from django.http import HttpResponse
-from django.shortcuts import redirect, render_to_response
+from django.shortcuts import redirect, render
 from beelogger.models import HiveUser, Check, Credit
 import csv
 from datetime import datetime, date, timedelta
 from django.db.models.aggregates import Sum
-
-class TestView(TemplateView):
-    template_name = 'test.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(TestView, self).get_context_data(**kwargs)
-
-        context['hiveuser'] = HiveUser.objects.all()
-
-        context['today'] = datetime.datetime.now()
-
-        return context
 
 class IndexView(TemplateView):
     template_name = 'beelogger/index.html'
 
 """ Returns state of user """
 def CheckUserStateView(request):
-    user = HiveUser.objects.filter(user__username=request.POST['pin'])
-    if user:
-        if user[0].is_checked_in():
-            text = 'in'
-        else:
-            text = 'out'
+    user_set = HiveUser.objects.filter(user__username=request.POST['pin'])
+    if user_set:
+        extra_context = {
+            'user': user_set[0]
+        }
+        return render(request, 'beelogger/user-check-state.html', extra_context)
     else:
-        text = 'invalid pin'
-
-    return HttpResponse(text)
+        return HttpResponse('<div class="alert alert-error">Invalid PIN</div>')
 
 """ Actual checking-in/out """
 def UserCheckInOutView(request):
@@ -53,7 +39,7 @@ def UserCheckInOutView(request):
 
         extra_context = {'user': user, 'check': check}
 
-        return render_to_response('beelogger/user-checked-in-out.html', extra_context)
+        return render(request, 'beelogger/user-checked-in-out.html', extra_context)
 
 def CSVDumpView(request):
     response,writer = PrepareCSVResponseObject()
@@ -91,7 +77,7 @@ def CSVDumpCurrentMonth(request):
         # basically in this format the users' check ins and outs are going to be interleaved
         # so we'd have to search for the user's check-in/out rather than being able to assume
         # it's in the next row over. not sure if that's worth it. might give up
-        # on having users interleaved in order and just have all their activity for a 
+        # on having users interleaved in order and just have all their activity for a
         # month/day together, followed by next user. see if we can better clarify what
         # sorts of dumps would be most useful
         checks = GetOneMonthsData(today.year, today.month)
@@ -110,7 +96,7 @@ def GetOneMonthsData(year, month, specificUser = False):
     else:
         endYear = year + 1
         endMonth = 1
-    
+
     endMonthDate = datetime(endYear,endMonth,1) - timedelta(seconds = 1) # one second before midnight
 
     if specificUser:
@@ -120,7 +106,7 @@ def GetOneMonthsData(year, month, specificUser = False):
     else:
         checks = Check.objects.filter(datetime__gte = beginMonthDate) \
             .filter(datetime__lte = endMonthDate)
-    
+
     return checks
 
 def PrepareCSVResponseObject():
@@ -170,11 +156,10 @@ def ProcessChecks(checks):
                         .filter(datetime__gte = totalling_before_date) \
                         .filter(unit_type = cc.unit_type) \
                         .aggregate(sum = Sum('units'))['sum']
-                
+
                 result.append([checks[i].user,in_time,out_time,visit_time,total_time, \
                     cc_units,ccs_before,cc_unit_type])
 
             i += 1
 
         return result
-

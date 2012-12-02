@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, include, url
-from beelogger.views import TestView
 from beelogger import urls as beelogger_urls
 
 # Uncomment the next two lines to enable the admin:

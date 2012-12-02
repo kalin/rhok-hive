@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{% if user.is_checked_in %}Good to see you{% else %}See you later{% endif %} {{ user.user.first_name }}!</h1>
+
+{% if user.is_unlimited %}
+<div class="alert alert-info">You are unlimited until {{ user.get_unlimited_expiry_date }}</div>
+{% else %}
+
+{% with days=user.get_credit_days %}
+{% if days %}
+<div class="alert alert-info">{{ days|floatformat }} day passes left</div>
+{% endif %}
+{% endwith %}
+
+{% with hours=user.get_credit_hours %}
+{% if hours > 0.1 %}
+<div class="alert alert-info">{{ hours|floatformat:"1" }} hours left</div>
+{% endif %}
+{% endwith %}
+
+{% endif %}
+
+<a class="btn btn-large" id="return-btn" href="{% url index %}">Back to Login</a>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>{% block title %}{% endblock %}</title>
+
+<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+<link href="{{ STATIC_URL }}css/bootstrap-responsive.css" rel="stylesheet">
+
+<script src="{{ STATIC_URL }}js/jquery.js"></script>
+<script src="{{ STATIC_URL }}js/keyboard.js"></script>
+
+</head>
+
+<body>
+
+<table id="container">
+	<tr>
+		<td>
+			<div id="content">
+				<img src="{{ STATIC_URL }}img/hive_logo.gif" alt="Hive" id="hive-logo" />
+			{% block content %}{% endblock %}
+			</div>
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>
