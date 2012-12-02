@@ -44,29 +44,6 @@ class HiveUser(models.Model):
         else:
             return False
 
-""" Credit """
-class Credit(models.Model):
-    UNIT_TYPE_CHOICES = (
-        ('H', 'Hours'),
-        ('D', 'Days'),
-        ('U', 'Unlimited'),
-    )
-    user = models.ForeignKey(HiveUser)
-    units = models.FloatField()
-    datetime = models.DateTimeField(auto_now_add=True)
-    unit_type = models.CharField(max_length=1, choices=UNIT_TYPE_CHOICES, default='H')
-    check = models.ForeignKey(Check, blank=True, null=True)
-
-    class Meta:
-        ordering = ['-datetime']
-
-    def format_unit(self):
-        return '%F %s' % (self.units, self.get_unit_type_display().lower())
-    format_unit.short_description = 'Credit/Debit'
-
-    def __unicode__(self):
-        return '%s | %s' % (self.user, self.format_unit())
-
 """ Check-in/check-out """
 class Check(models.Model):
     CHECK_TYPE_CHOICES = (
@@ -102,3 +79,26 @@ class Check(models.Model):
                 credit.save()
 
         super(Check, self).save(*args, **kwargs)
+
+""" Credit """
+class Credit(models.Model):
+    UNIT_TYPE_CHOICES = (
+        ('H', 'Hours'),
+        ('D', 'Days'),
+        ('U', 'Unlimited'),
+    )
+    user = models.ForeignKey(HiveUser)
+    units = models.FloatField()
+    datetime = models.DateTimeField(auto_now_add=True)
+    unit_type = models.CharField(max_length=1, choices=UNIT_TYPE_CHOICES, default='H')
+    check = models.ForeignKey(Check, blank=True, null=True)
+
+    class Meta:
+        ordering = ['-datetime']
+
+    def format_unit(self):
+        return '%F %s' % (self.units, self.get_unit_type_display().lower())
+    format_unit.short_description = 'Credit/Debit'
+
+    def __unicode__(self):
+        return '%s | %s' % (self.user, self.format_unit())
