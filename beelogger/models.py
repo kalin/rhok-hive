@@ -25,7 +25,17 @@ class HiveUser(models.Model):
 
     def is_unlimited(self):
         today = dt.datetime.now()
-        return today < self.get_unlimited_expiry_date()
+        return (today - self.get_unlimited_expiry_date())
+
+    def is_checked_in(self):
+        last_check = self.check_set.all()[:1]
+        if last_check:
+            if last_check[0].check_type == 'in':
+                return True
+            else:
+                return False
+        else:
+            return False
 
 """ Credit """
 class Credit(models.Model):
@@ -68,3 +78,12 @@ class Check(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.user, self.datetime)
+
+    def save(self, *args, **kwargs):
+        # We might need to record time spent by the user
+        if self.check_type == 'ou':
+            check_out_datetime = dt.datetime.now()
+            check_in_datetime = self.user.check_set.filter(check_type='in')[0].datetime
+            timedelta = check_out_datetime - check_in_datetime
+
+        super(Check, self).save(*args, **kwargs)
