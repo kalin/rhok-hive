@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 from django.http import HttpResponse
-from django.shortcuts import redirect, render_to_response
+from django.shortcuts import redirect, render
 from beelogger.models import HiveUser, Check, Credit
 import csv
 from datetime import datetime, date, timedelta
@@ -89,7 +89,7 @@ def CSVDumpCurrentMonth(request):
         # basically in this format the users' check ins and outs are going to be interleaved
         # so we'd have to search for the user's check-in/out rather than being able to assume
         # it's in the next row over. not sure if that's worth it. might give up
-        # on having users interleaved in order and just have all their activity for a 
+        # on having users interleaved in order and just have all their activity for a
         # month/day together, followed by next user. see if we can better clarify what
         # sorts of dumps would be most useful
         checks = GetOneMonthsData(today.year, today.month)
@@ -108,7 +108,7 @@ def GetOneMonthsData(year, month, specificUser = False):
     else:
         endYear = year + 1
         endMonth = 1
-    
+
     endMonthDate = datetime(endYear,endMonth,1) - timedelta(seconds = 1) # one second before midnight
 
     if specificUser:
@@ -118,7 +118,7 @@ def GetOneMonthsData(year, month, specificUser = False):
     else:
         checks = Check.objects.filter(datetime__gte = beginMonthDate) \
             .filter(datetime__lte = endMonthDate)
-    
+
     return checks
 
 def PrepareCSVResponseObject():
@@ -175,7 +175,7 @@ def ProcessChecks(checks):
                         .filter(datetime__gte = totalling_before_date) \
                         .filter(unit_type = cc.unit_type) \
                         .aggregate(sum = Sum('units'))['sum']
- 
+
                 if (current_user in user_last_reload) == False:
                     # get the most recent positive credit for the given user
                     user_last_reload[checks[i].user] = Credit.objects.filter(user = current_user) \
@@ -195,4 +195,3 @@ def ProcessChecks(checks):
             i += 1
 
         return result
-
