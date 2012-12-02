@@ -1,5 +1,5 @@
 from django.contrib import admin
-from beelogger.models import Credit, Check
+from beelogger.models import Credit, Check, HiveUser
 
 class CreditAdmin(admin.ModelAdmin):
     list_display = ('user', 'format_unit', 'datetime')
@@ -13,3 +13,4 @@ class CheckAdmin(admin.ModelAdmin):
 
 admin.site.register(Credit, CreditAdmin)
 admin.site.register(Check, CheckAdmin)
+admin.site.register(HiveUser)
