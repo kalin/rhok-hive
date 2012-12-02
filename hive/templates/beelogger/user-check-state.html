@@ -1,14 +1,18 @@
 {% if user.is_checked_in %}
 <input type="submit" class="btn btn-danger btn-large" value="Check-out" />
 {% else %}
-	{% with daypasses=user.get_credit_days %}
-	{% if daypasses > 0 %}
-	<label class="checkbox">
-		<input type="checkbox" name="use_daypass" /> Use 1 of my {{ daypasses|floatformat }} daypasses left
-	</label>
-	{% endif %}
-	{% endwith %}
-	<div>
-		<input type="submit" class="btn btn-success btn-large" value="Check-in" />
-	</div>
+    {% if user.can_check_in %}
+        {% with daypasses=user.get_credit_days %}
+        {% if daypasses > 0 %}
+        <label class="checkbox">
+            <input type="checkbox" name="use_daypass" /> Use 1 of my {{ daypasses|floatformat }} daypasses left
+        </label>
+        {% endif %}
+        {% endwith %}
+        <div>
+            <input type="submit" class="btn btn-success btn-large" value="Check-in" />
+        </div>
+    {% else %}
+        <div class="alert alert-error">You have no more credits, please refill.</div>
+    {% endif %}
 {% endif %}

@@ -18,6 +18,16 @@ class HiveUser(models.Model):
         q = self.credit_set.filter(unit_type='D').aggregate(total=Sum('units'))
         return q['total']
 
+    def can_check_in(self):
+        has_days = self.get_credit_days() > 0
+        has_hours = self.get_credit_hours() > 0
+        is_unlimited = self.is_unlimited()
+
+        if has_days or has_hours or is_unlimited:
+            return True
+        else:
+            return False
+
     def get_unlimited_expiry_date(self):
         UNLIMITED_TIME = dt.timedelta(weeks=4) # 1 month
         unlimited_credit = self.credit_set.filter(unit_type='U')[:1]
