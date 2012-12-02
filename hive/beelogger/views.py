@@ -13,3 +13,6 @@ class TestView(TemplateView):
         context['today'] = datetime.datetime.now()
 
         return context
+
+class IndexView(TemplateView):
+    template_name = 'index.html'
