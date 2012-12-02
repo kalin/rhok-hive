@@ -53,6 +53,21 @@ def UserCheckInOutView(request):
 
         return render(request, 'beelogger/user-checked-in-out.html', extra_context)
 
+def UsersCurrentlyCheckedIn(request):
+    response = HttpResponse(mimetype = 'text/plain') # use application/json or something later
+
+    today = date.today()
+
+    checkins = Check.objects.filter(datetime__gte = today) \
+        .filter(check_type = 'in').count()
+
+    checkouts = Check.objects.filter(datetime__gte = today) \
+        .filter(check_type = 'ou').count()
+
+    response.write(str(checkins - checkouts))
+
+    return response
+
 def CSVDumpView(request):
     response,writer = PrepareCSVResponseObject()
 
