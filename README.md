@@ -1,7 +1,6 @@
-rhok-hive
-=========
+#rhok-hive
 
-==git usage
+## git usage
 
 add these entries to your .gitignore file
 
@@ -11,7 +10,7 @@ venv
 *.db
 ```
 
-==Heroku deployment
+## Heroku deployment
 
 App is currently set up to use wsgi, should be upgraded to gunicorn
 
@@ -44,11 +43,11 @@ heroku run python manage.py syncdb # sync database
 heroku run python manage.py shell  # launch production shell
 ```
 
-=== Running cron tasks in heroku
+### Running cron tasks in heroku
 
 See: https://devcenter.heroku.com/articles/scheduler
 
-=== Heroku specific settings
+### Heroku specific settings
 
 heroku supports persistent config vars like this:
 
@@ -57,4 +56,6 @@ heroku config
 heroku config:set DJANGO_ENVIRONMENT=heroku
 ```
 
-Heroku environment-specific overrides are currently in the main settings.py file and activated by environemnt variable DJANGO_ENVIRONMENT=heroku
+Heroku environment-specific overrides are currently in the main settings.py file and activated by environemnt variable 
+
+DJANGO_ENVIRONMENT=heroku
