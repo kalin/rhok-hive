@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     # ex: /polls/5/results/
     url(r'^check-user-state/$', views.CheckUserStateView, name='check_user_state'),
     url(r'^check-user-in-out/$', views.UserCheckInOutView, name='check_user_in_out'),
+    url(r'^csvdump/$', views.CSVDumpView, name='csv_dump'),
 )
