@@ -1,5 +1,8 @@
 # Django settings for hive project.
 import os
+# SITE_ROOT: to allow for relative paths
+SITE_ROOT = lambda base : os.path.join(os.path.dirname(__file__), base).replace('\\','/')
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -19,13 +22,15 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/home/jeremy/www-dev/django/rhok-hive/hive/hive.db',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+DATABASES['default']['NAME'] = SITE_ROOT('hive.db') # default path for sqlite db.
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -117,7 +122,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/jeremy/www-dev/django/rhok-hive/hive/templates',
+    SITE_ROOT('templates') # actually, use relative paths
 )
 
 INSTALLED_APPS = (
