@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 from django.contrib.auth.models import User
 import datetime as dt
 
@@ -10,10 +11,12 @@ class HiveUser(models.Model):
         return '%s' % self.user
 
     def get_credit_hours(self):
-        return self.credit_set.filter(unit_type='U')
+        q = self.credit_set.filter(unit_type='H').aggregate(total=Sum('units'))
+        return q['total']
 
     def get_credit_days(self):
-        return self.credit_set.filter(unit_type='D')
+        q = self.credit_set.filter(unit_type='D').aggregate(total=Sum('units'))
+        return q['total']
 
     def get_unlimited_expiry_date(self):
         UNLIMITED_TIME = dt.timedelta(weeks=4) # 1 month
@@ -25,7 +28,11 @@ class HiveUser(models.Model):
 
     def is_unlimited(self):
         today = dt.datetime.now()
-        return (today - self.get_unlimited_expiry_date())
+        expiry_date = self.get_unlimited_expiry_date()
+        if expiry_date:
+            return today < expiry_date
+        else:
+            return False
 
     def is_checked_in(self):
         last_check = self.check_set.all()[:1]
@@ -45,7 +52,7 @@ class Credit(models.Model):
         ('U', 'Unlimited'),
     )
     user = models.ForeignKey(HiveUser)
-    units = models.IntegerField()
+    units = models.FloatField()
     datetime = models.DateTimeField(auto_now_add=True)
     unit_type = models.CharField(max_length=1, choices=UNIT_TYPE_CHOICES, default='H')
 
@@ -53,7 +60,7 @@ class Credit(models.Model):
         ordering = ['-datetime']
 
     def format_unit(self):
-        return '%d %s' % (self.units, self.get_unit_type_display().lower())
+        return '%F %s' % (self.units, self.get_unit_type_display().lower())
     format_unit.short_description = 'Credit/Debit'
 
     def __unicode__(self):
@@ -68,6 +75,7 @@ class Check(models.Model):
     user = models.ForeignKey(HiveUser)
     datetime = models.DateTimeField(auto_now_add=True)
     check_type = models.CharField(max_length=2, choices=CHECK_TYPE_CHOICES, default='in')
+    using_daypass = models.BooleanField()
 
     class Meta:
         ordering = ['-datetime']
@@ -82,8 +90,14 @@ class Check(models.Model):
     def save(self, *args, **kwargs):
         # We might need to record time spent by the user
         if self.check_type == 'ou':
-            check_out_datetime = dt.datetime.now()
-            check_in_datetime = self.user.check_set.filter(check_type='in')[0].datetime
-            timedelta = check_out_datetime - check_in_datetime
+            if not self.user.is_unlimited():
+                check_in = self.user.check_set.filter(check_type='in')[0]
+                if check_in.using_daypass:
+                    credit = Credit(user=self.user, units=-1, unit_type='D')
+                else:
+                    timedelta = dt.datetime.now() - check_in.datetime
+                    hours = timedelta.total_seconds()/3600.0*-1
+                    credit = Credit(user=self.user, units=hours, unit_type='H')
+                credit.save()
 
         super(Check, self).save(*args, **kwargs)
