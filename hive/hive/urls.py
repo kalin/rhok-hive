@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'hive.views.home', name='home'),
     # url(r'^hive/', include('hive.foo.urls')),
     url(r'^beelogger/', include(beelogger_urls)),
+    url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
