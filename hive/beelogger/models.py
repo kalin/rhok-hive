@@ -55,6 +55,7 @@ class Credit(models.Model):
     units = models.FloatField()
     datetime = models.DateTimeField(auto_now_add=True)
     unit_type = models.CharField(max_length=1, choices=UNIT_TYPE_CHOICES, default='H')
+    check = models.ForeignKey(Check, blank=True, null=True)
 
     class Meta:
         ordering = ['-datetime']
@@ -93,11 +94,11 @@ class Check(models.Model):
             if not self.user.is_unlimited():
                 check_in = self.user.check_set.filter(check_type='in')[0]
                 if check_in.using_daypass:
-                    credit = Credit(user=self.user, units=-1, unit_type='D')
+                    credit = Credit(user=self.user, units=-1, unit_type='D', check=self)
                 else:
                     timedelta = dt.datetime.now() - check_in.datetime
                     hours = timedelta.total_seconds()/3600.0*-1
-                    credit = Credit(user=self.user, units=hours, unit_type='H')
+                    credit = Credit(user=self.user, units=hours, unit_type='H', check=self)
                 credit.save()
 
         super(Check, self).save(*args, **kwargs)
