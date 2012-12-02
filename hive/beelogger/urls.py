@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     url(r'^csvdump/$', views.CSVDumpView, name='csv_dump'),
     url(r'^csvmonthdump/$', views.CSVDumpCurrentMonth, name='csv_month_dump'),
     url(r'^csvuserdump/$', views.CSVDumpUser, name='csv_dump_user'),
+    url(r'^currentusers/$', views.UsersCurrentlyCheckedIn, name='current_users'),
 )
