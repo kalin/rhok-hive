@@ -169,8 +169,7 @@ LOGGING = {
     }
 }
 
-ENVIRONMENT = os.getenv("DJANGO_ENVIRONMENT")
-if ENVIRONMENT == "heroku":
+if os.getenv("DJANGO_ENVIRONMENT") == "heroku":
     import dj_database_url # import database settings for heroku
     DATABASES = {}
     DATABASES['default'] = dj_database_url.config()
