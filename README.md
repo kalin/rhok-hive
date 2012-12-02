@@ -56,6 +56,4 @@ heroku config
 heroku config:set DJANGO_ENVIRONMENT=heroku
 ```
 
-Heroku environment-specific overrides are currently in the main settings.py file and activated by environemnt variable 
-
-DJANGO_ENVIRONMENT=heroku
+Heroku environment-specific overrides are currently in the main settings.py file and activated by this variable
