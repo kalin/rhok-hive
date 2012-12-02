@@ -2,6 +2,7 @@
 import os
 # SITE_ROOT: to allow for relative paths
 SITE_ROOT = lambda base : os.path.join(os.path.dirname(__file__), base).replace('\\','/')
+PROJECT_ROOT = lambda base : os.path.join(os.path.dirname(__file__),'..', base).replace('\\','/')
 
 
 DEBUG = True
@@ -29,7 +30,7 @@ DATABASES = {
     }
 }
 
-DATABASES['default']['NAME'] = SITE_ROOT('hive.db') # default path for sqlite db.
+DATABASES['default']['NAME'] = PROJECT_ROOT('hive.db') # default path for sqlite db.
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -71,7 +72,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = PROJECT_ROOT('static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -122,7 +123,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    SITE_ROOT('templates') # actually, use relative paths
+    PROJECT_ROOT('templates') # actually, use relative paths
 )
 
 INSTALLED_APPS = (
