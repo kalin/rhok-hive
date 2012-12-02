@@ -1,4 +1,5 @@
 # Django settings for hive project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -162,3 +163,9 @@ LOGGING = {
         },
     }
 }
+
+ENVIRONMENT = os.getenv("DJANGO_ENVIRONMENT")
+if ENVIRONMENT == "heroku":
+    import dj_database_url # import database settings for heroku
+    DATABASES = {}
+    DATABASES['default'] = dj_database_url.config()
