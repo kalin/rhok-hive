@@ -1,0 +1,29 @@
+<body>
+
+	Today: {{ today }} <br/>
+
+{% for user in hiveuser %}
+
+<div>{{ user.user.username }}</div>
+<div>Hours available: {{ user.get_credit_hours }}</div>
+<div>Days available: {{ user.get_credit_days }}</div>
+<div>{{ user.get_unlimited_expiry_date }}</div>
+<div>
+	{% if user.is_checked_in %}
+	User checked in
+	{% else %}
+	User not checked in
+	{% endif %}
+</div>
+<div>
+	{% if user.is_unlimited %}
+	User unlimited
+	{% else %}
+	Limited user
+	{% endif %}
+</div>
+
+{% endfor %}
+
+
+</body>
