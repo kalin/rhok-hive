@@ -76,6 +76,7 @@ class Check(models.Model):
         return '%s - %s' % (self.user, self.datetime)
 
     def save(self, *args, **kwargs):
+        super(Check, self).save(*args, **kwargs)
         # We might need to record time spent by the user
         if self.check_type == 'ou':
             if not self.user.is_unlimited():
@@ -87,8 +88,6 @@ class Check(models.Model):
                     hours = timedelta.total_seconds()/3600.0*-1
                     credit = Credit(user=self.user, units=hours, unit_type='H', check=self)
                 credit.save()
-
-        super(Check, self).save(*args, **kwargs)
 
 """ Credit """
 class Credit(models.Model):
