@@ -61,6 +61,7 @@ def CSVDumpView(request):
 
     for user in HiveUser.objects.all():
         results = ProcessChecks(user.check_set.all())
+        results.reverse()
 
         for result in results:
             writer.writerow(result)
@@ -84,22 +85,17 @@ def CSVDumpCurrentMonth(request):
 
     if 'pin' in request.GET:
         checks = GetOneMonthsData(today.year, today.month, request.GET['pin'])
+        results = ProcessChecks(checks)
+        results.reverse()
+        for result in results:
+            writer.writerow(result)
     else:
-        #checks = []
-        #for user in HiveUser.objects.all():
-        #    checks.extend(GetOneMonthsData(today.year, today.month, user.user))
-        #TODO! this returns incorrect data, datetimes are in wrong places
-        # basically in this format the users' check ins and outs are going to be interleaved
-        # so we'd have to search for the user's check-in/out rather than being able to assume
-        # it's in the next row over. not sure if that's worth it. might give up
-        # on having users interleaved in order and just have all their activity for a
-        # month/day together, followed by next user. see if we can better clarify what
-        # sorts of dumps would be most useful
-        checks = GetOneMonthsData(today.year, today.month)
-
-    for result in ProcessChecks(checks):
-        writer.writerow(result)
-
+        for user in HiveUser.objects.all():
+            checks = GetOneMonthsData(today.year, today.month, user.user)
+            results = ProcessChecks(checks)
+            results.reverse()
+            for result in results:
+                writer.writerow(result)
     return response
 
 def GetOneMonthsData(year, month, specificUser = False):
