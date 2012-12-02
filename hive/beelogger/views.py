@@ -130,7 +130,8 @@ def PrepareCSVResponseObject():
     response = HttpResponse(mimetype='text/plain')
 
     writer = csv.writer(response)
-    writer.writerow(['user','in_time','out_time','visit_time','total_time', \
+    writer.writerow(['user','last_reload','over_limit', \
+        'in_time','out_time','visit_time','total_time', \
         'credit_change','ccs_before','cc_unit_type'])
 
     return response,writer
@@ -144,7 +145,11 @@ def ProcessChecks(checks):
 
         result = []
         total_time = timedelta()
-        totalling_before_date = checks[len(checks)-1].datetime
+
+        first_check = checks[len(checks)-1].datetime
+        totalling_before_date = date(first_check.year, first_check.month, 1)
+
+        user_last_reload = dict()
 
         i = 0
         while i < len(checks):
@@ -156,6 +161,8 @@ def ProcessChecks(checks):
                 visit_time = out_time - in_time
                 total_time += visit_time
 
+                current_user = checks[i].user
+
                 credit_changes = checks[i].credit_set.all()
                 cc_units = 0
                 ccs_before = 0
@@ -164,14 +171,27 @@ def ProcessChecks(checks):
                     cc = credit_changes[0] # the credit change for this visit
                     cc_units = cc.units
                     cc_unit_type = cc.unit_type
-                    ccs_before = Credit.objects.all() \
-                        .filter(user = checks[i].user) \
+                    ccs_before = Credit.objects \
+                        .filter(user = current_user) \
                         .filter(datetime__lte = cc.datetime) \
                         .filter(datetime__gte = totalling_before_date) \
                         .filter(unit_type = cc.unit_type) \
                         .aggregate(sum = Sum('units'))['sum']
-                
-                result.append([checks[i].user,in_time,out_time,visit_time,total_time, \
+ 
+                if (current_user in user_last_reload) == False:
+                    # get the most recent positive credit for the given user
+                    user_last_reload[checks[i].user] = Credit.objects.filter(user = current_user) \
+                        .filter(units__gt = 0) \
+                        .filter(unit_type = cc_unit_type) \
+                        .order_by('-datetime')[:1]
+
+                current_reload = None
+                if (current_user in user_last_reload) and (len(user_last_reload[current_user]) > 0):
+                    current_reload = user_last_reload[current_user][0].format_unit()
+                over_limit = (ccs_before <= 0)
+
+                result.append([checks[i].user, current_reload, over_limit, \
+                    in_time, out_time, visit_time, total_time, \
                     cc_units,ccs_before,cc_unit_type])
 
             i += 1
