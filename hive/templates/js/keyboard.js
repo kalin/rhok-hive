@@ -1,4 +1,5 @@
-$(".keyboard-btn").click(function() {
+$(".keyboard-btn").click(function(e) {
+	e.preventDefault();
     enterValue($(this).val());
 });
 
@@ -10,4 +11,3 @@ function enterValue(x) {
 function clearPin() {
     document.getElementById("pin-input").value = '';
 }
-
