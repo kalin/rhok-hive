@@ -1,0 +1,26 @@
+<body>
+
+	Today: {{ today }} <br/>
+
+{% for user in hiveuser %}
+	{{ user.user.username }}
+	<ul>
+	{% for cred in user.get_credit %}
+		<li>{{ cred }}</li>
+	{% endfor %}
+	</ul>
+
+	{{ user.get_unlimited_expiry_date }}
+
+	{{ user.is_unlimited }}
+
+	{% if user.is_unlimited %}
+	User unlimited
+	{% else %}
+	Limited user
+	{% endif %}
+
+{% endfor %}
+
+
+</body>
